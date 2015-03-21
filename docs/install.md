@@ -12,7 +12,7 @@ To take advantage of Web Starter Kit you need to:
 The dependencies are:
 * [Node.js](http://nodejs.org)
 * [gulp.js](http://gulpjs.com)
-* [Less](http://lesscss.org/)
+* [Sass](http://sass-lang.com/install)
 * [BootStrap](http://getbootstrap.com/)
 
 ### Node
@@ -24,11 +24,13 @@ If you require Node, go to [nodejs.org](http://nodejs.org/) and click on the big
 
 If you require Bootstrap, it can be installed from the [Bootstrap downloads](http://getbootstrap.com/getting-started/) page.
 
-### Less
+### Sass
 
-If Less is installed it should return a version number at or above 3.3.x.
+Make sure you have [Ruby](#ruby) installed before proceeding.
+Bring up a terminal and type `sass --version`.
+If Sass is installed it should return a version number at or above 3.3.x.
 If you don't see any errors, proceed to check for [gulp](#gulp).
-If you need to install Less, see the command-line instructions on the [Less installation]((http://lesscss.org/#using-less-installation) page.
+If you need to install Sass, see the command-line instructions on the [Sass installation](http://sass-lang.com/install) page.
 
 ### Gulp
 
