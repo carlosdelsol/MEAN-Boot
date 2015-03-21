@@ -25,6 +25,7 @@ var $ = require('gulp-load-plugins')();
 var del = require('del');
 var runSequence = require('run-sequence');
 var browserSync = require('browser-sync');
+var nodemon = require('gulp-nodemon');
 var pagespeed = require('psi');
 var reload = browserSync.reload;
 
@@ -83,14 +84,29 @@ gulp.task('fonts', function () {
 });
 
 // Compile and Automatically Prefix Stylesheets
-gulp.task('styles', function () {
+gulp.task('sass', function () {
   // For best performance, don't add Sass partials to `gulp.src`
-  return gulp.src(['public/styles/theme.less', 'public/styles/*.css'])
-    .pipe($.changed('styles', {extension: '.less'}))
-    .pipe($.less())
+  return gulp.src([
+    'public/styles/theme.scss',
+    'public/styles/sass/*.scss'
+  ])
+    .pipe($.changed('styles', {extension: '.scss'}))
+    .pipe($.rubySass({
+      style: 'expanded',
+      precision: 10
+    }))
     .on('error', console.error.bind(console))
     .pipe($.autoprefixer({browsers: AUTOPREFIXER_BROWSERS}))
     .pipe(gulp.dest('.tmp/styles'))
+    // Concatenate And Minify Styles
+    .pipe($.if('*.css', $.csso()))
+    .pipe(gulp.dest('dist/styles'))
+    .pipe($.size({title: 'styles'}));
+});
+
+gulp.task('styles', function () {
+  // For best performance, don't add Sass partials to `gulp.src`
+  return gulp.src(['public/styles/*.css'])
     // Concatenate And Minify Styles
     .pipe($.if('*.css', $.csso()))
     .pipe(gulp.dest('dist/styles'))
@@ -137,37 +153,41 @@ gulp.task('html', function () {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['styles'], function () {
-  browserSync({
-    notify: false,
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: ['.tmp', 'public']
-  });
+gulp.task('serve', ['styles', 'nodemon'], function () {
+  browserSync.init(null, {
+		proxy: "http://localhost:3000",
+        files: ["public/**/*.*"],
+        browser: "google chrome",
+        port: 5000,
+	});
 
   gulp.watch(['public/**/*.html'], reload);
-  gulp.watch(['public/styles/**/*.{less,css}'], ['styles', reload]);
+  gulp.watch(['public/styles/**/*.{scss,css}'], ['styles', reload]);
   gulp.watch(['public/scripts/**/*.js'], ['jshint']);
   gulp.watch(['public/images/**/*'], reload);
 });
 
 // Build and serve the output from the dist build
-gulp.task('serve:dist', ['default'], function () {
-  browserSync({
-    notify: false,
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: 'dist'
+gulp.task('serve:dist', ['nodemon'], function () {
+  browserSync.init(null, {
+		proxy: "http://localhost:3000",
+        files: ["dist/**/*.*"],
+        browser: "google chrome",
+        port: 5000,
+	});
+});
+
+gulp.task('nodemon', function (cb) {
+	return nodemon({
+	  script: './bin/www'
+	}).on('start', function () {
+      cb();
   });
 });
 
 // Build Production Files, the Default Task
 gulp.task('default', ['clean'], function (cb) {
-  runSequence('styles', ['jshint', 'html', 'images', 'fonts', 'copy'], cb);
+  runSequence('sass', 'styles', ['jshint', 'html', 'images', 'fonts', 'copy'], cb);
 });
 
 // Run PageSpeed Insights
