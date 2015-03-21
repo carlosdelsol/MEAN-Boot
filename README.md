@@ -1,4 +1,4 @@
-# MEAN-Bootstrap
+# MEAN-Boot
 MEAN Boilerplate based on Bootstrap &amp; Tooling for Multi-Device Development
 
 ## Overview
