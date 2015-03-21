@@ -162,7 +162,7 @@ gulp.task('serve', ['styles', 'nodemon'], function () {
 	});
 
   gulp.watch(['public/**/*.html'], reload);
-  gulp.watch(['public/styles/**/*.{scss,css}'], ['styles', reload]);
+  gulp.watch(['public/styles/**/*.{scss,css}'], ['styles', 'sass', reload]);
   gulp.watch(['public/scripts/**/*.js'], ['jshint']);
   gulp.watch(['public/images/**/*'], reload);
 });
